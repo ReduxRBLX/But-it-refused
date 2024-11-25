@@ -97,63 +97,74 @@ end
 local ts = game:GetService("TweenService")
 
 local function fadeUI(FadeFrame)
-	local function hasProperty(object, prop)
-		local t = object[prop]
-	end
+	local wrap
 
-	for i, v in pairs(FadeFrame:GetChildren()) do
-		local success = pcall(function() hasProperty(v, "Visible") end)
-
-		if success then
-			v.Visible = false
+	wrap = task.spawn(function()
+		local function hasProperty(object, prop)
+			local t = object[prop]
 		end
-	end
 
-	local prevTransparency = FadeFrame.BackgroundTransparency
+		for i, v in pairs(FadeFrame:GetChildren()) do
+			local success = pcall(function() hasProperty(v, "Visible") end)
 
-	local Framefade = ts:Create(FadeFrame, TweenInfo.new(1), {BackgroundTransparency = 1})
-	Framefade:Play()
-	Framefade.Completed:Wait()
-	FadeFrame.Visible = false
-
-	FadeFrame.BackgroundTransparency = prevTransparency
-
-	for i, v in pairs(FadeFrame:GetChildren()) do
-		local success = pcall(function() hasProperty(v, "Visible") end)
-
-		if success then
-			v.Visible = true
+			if success then
+				v.Visible = false
+			end
 		end
-	end
+
+		local prevTransparency = FadeFrame.BackgroundTransparency
+
+		local Framefade = ts:Create(FadeFrame, TweenInfo.new(1), {BackgroundTransparency = 1})
+		Framefade:Play()
+		Framefade.Completed:Wait()
+		FadeFrame.Visible = false
+
+		FadeFrame.BackgroundTransparency = prevTransparency
+
+		for i, v in pairs(FadeFrame:GetChildren()) do
+			local success = pcall(function() hasProperty(v, "Visible") end)
+
+			if success then
+				v.Visible = true
+			end
+		end
+		coroutine.yield()
+		coroutine.close(wrap)
+	end)
 end
 
+local respawning = false
+
 hum.Died:Connect(function()
-	local enabled = plr:WaitForChild("EnableRefuse")
+	if respawning == false then
+		respawning = true
+		local enabled = plr:WaitForChild("EnableRefuse")
 
-	if enabled.Value == true then
-		frame.Visible = true
+		if enabled.Value == true then
+			frame.Visible = true
 
-		local sound = Instance.new("Sound", workspace)
-		sound.SoundId = "rbxassetid://5193339590"		
-		sound.Volume = 1
-		sound:Play()
-		task.wait(2.5)
+			local sound = Instance.new("Sound", workspace)
+			sound.SoundId = "rbxassetid://5193339590"		
+			sound.Volume = 1
+			sound:Play()
+			task.wait(2.5)
 
-		sound.Ended:Connect(function()
-			sound:Destroy()
-		end)
+			sound.Ended:Connect(function()
+				sound:Destroy()
+			end)
 
-		local sound2 = Instance.new("Sound", workspace)
-		sound2.SoundId = "rbxassetid://7148330411"	
-		sound2.Volume = 1
-		sound2:Play()
+			local sound2 = Instance.new("Sound", workspace)
+			sound2.SoundId = "rbxassetid://7148330411"	
+			sound2.Volume = 1
+			sound2:Play()
 
-		sound2.Ended:Connect(function()
-			sound2:Destroy()
-		end)
+			sound2.Ended:Connect(function()
+				sound2:Destroy()
+			end)
 
-		text.Visible = true
-		heart.Image = "rbxassetid://9632333669"
+			text.Visible = true
+			heart.Image = "rbxassetid://9632333669"
+		end
 	end
 end)
 
@@ -204,33 +215,38 @@ plr.CharacterAdded:Connect(function(char)
 		end
 	end
 	
+	respawning = false
+	
 	hum.Died:Connect(function()
-		local enabled = plr:WaitForChild("EnableRefuse")
+		if respawning == false then
+			respawning = true
+			local enabled = plr:WaitForChild("EnableRefuse")
 
-		if enabled.Value == true then
-			frame.Visible = true
-			
-			local sound = Instance.new("Sound", workspace)
-			sound.SoundId = "rbxassetid://5193339590"		
-			sound.Volume = 1
-			sound:Play()
-			task.wait(2.5)
-			
-			sound.Ended:Connect(function()
-				sound:Destroy()
-			end)
-			
-			local sound2 = Instance.new("Sound", workspace)
-			sound2.SoundId = "rbxassetid://7148330411"	
-			sound2.Volume = 1
-			sound2:Play()
-			
-			sound2.Ended:Connect(function()
-				sound2:Destroy()
-			end)
-			
-			text.Visible = true
-			heart.Image = "rbxassetid://9632333669"
+			if enabled.Value == true then
+				frame.Visible = true
+				
+				local sound = Instance.new("Sound", workspace)
+				sound.SoundId = "rbxassetid://5193339590"		
+				sound.Volume = 1
+				sound:Play()
+				task.wait(2.5)
+				
+				sound.Ended:Connect(function()
+					sound:Destroy()
+				end)
+				
+				local sound2 = Instance.new("Sound", workspace)
+				sound2.SoundId = "rbxassetid://7148330411"	
+				sound2.Volume = 1
+				sound2:Play()
+				
+				sound2.Ended:Connect(function()
+					sound2:Destroy()
+				end)
+				
+				text.Visible = true
+				heart.Image = "rbxassetid://9632333669"
+			end
 		end
 	end)
 	
@@ -259,4 +275,3 @@ plr.CharacterAdded:Connect(function(char)
 		end
 	end)
 end)
-
