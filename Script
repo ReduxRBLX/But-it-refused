@@ -87,7 +87,7 @@ raycastParams.IgnoreWater = true
 
 local function isPlayerOnGround()
 	local origin = char.PrimaryPart.Position
-	local direction = Vector3.new(0, -1, 0).Unit
+	local direction = Vector3.new(0, -5, 2).Unit
 
 	local result = workspace:Raycast(origin, direction, raycastParams)
 
