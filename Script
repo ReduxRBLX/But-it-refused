@@ -1,1 +1,154 @@
+local plr = game:GetService("Players").LocalPlayer
+local char = plr.Character or plr.CharacterAdded:Wait()
+local hum = char:WaitForChild("Humanoid")
+local rootPart = char:WaitForChild("HumanoidRootPart")
 
+local enabledInt = Instance.new("BoolValue", plr)
+enabledInt.Name = "EnableRefuse"
+enabledInt.Value = true
+
+local UI = Instance.new("ScreenGui", plr.PlayerGui)
+UI.Name = "RefusedScript"
+UI.IgnoreGuiInset = true
+UI.ResetOnSpawn = false
+
+local cred = Instance.new("TextLabel", UI)
+cred.BackgroundTransparency = 1
+cred.Position = UDim2.new(0.725, 0, 0.016, 0)
+cred.Size = UDim2.new(0.257, 0, 0.041, 0)
+cred.Font = Enum.Font.Code
+cred.FontFace.Style = Enum.FontStyle.Italic
+cred.FontFace.Weight = Enum.FontWeight.Bold
+cred.Text = '"But it refused" - Made by ReduxRBLX'
+cred.TextColor3 = Color3.fromRGB(255, 255, 255)
+cred.TextScaled = true
+cred.TextStrokeTransparency = 0.85
+
+
+local toggle = Instance.new("TextButton", UI)
+toggle.BackgroundColor3 = Color3.fromRGB(85, 170, 0)
+toggle.BackgroundTransparency = 0.75
+toggle.Position = UDim2.new(0.78, 0, 0.069, 0)
+toggle.Size = UDim2.new(0.148, 0, 0.028, 0)
+toggle.Font = Enum.Font.Code
+toggle.Text = 'On'
+toggle.RichText = true
+toggle.TextScaled = true
+
+local uiCorner = Instance.new("UICorner", toggle)
+local uiStroke = Instance.new("UIStroke", toggle)
+uiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+uiStroke.Color = Color3.fromRGB(0,0,0)
+uiStroke.Thickness = 1.5
+
+toggle.MouseButton1Click:Connect(function()
+	if toggle.Text == 'On' then
+		toggle.Text = 'Off'
+		toggle.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+		enabledInt.Value = false
+	else
+		toggle.Text = 'On'
+		toggle.BackgroundColor3 = Color3.fromRGB(85, 170, 0)
+		enabledInt.Value = true
+	end
+end)
+
+
+local raycastParams = RaycastParams.new()
+raycastParams.FilterDescendantsInstances = {char}
+raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+raycastParams.IgnoreWater = true
+
+local function isPlayerOnGround()
+	local origin = char.PrimaryPart.Position
+	local direction = Vector3.new(0, -1, 0).Unit
+
+	local result = workspace:Raycast(origin, direction, raycastParams)
+
+	return result 
+end
+
+hum:GetPropertyChangedSignal("Health"):Connect(function()
+	local enabled = plr:WaitForChild("EnableRefuse")
+
+	if enabled.Value == true then
+		if not plr:FindFirstChild("DeathPos") then
+			local int = Instance.new("CFrameValue", plr)
+			int.Name = "DeathPos"
+
+			local raycastResult =  isPlayerOnGround()
+
+			if raycastResult then
+				int.Value = rootPart.CFrame
+			end
+		else
+			local int = plr.DeathPos
+
+			local raycastResult = isPlayerOnGround()
+
+			if raycastResult then
+				int.Value = rootPart.CFrame
+			end
+		end
+	end
+end)
+
+plr.CharacterAdded:Connect(function(char)
+	hum = char:WaitForChild("Humanoid")
+	rootPart = char:WaitForChild("HumanoidRootPart")
+
+	local enabled = plr:WaitForChild("EnableRefuse")
+	
+	if enabled.Value == true then
+		if plr:FindFirstChild("DeathPos") then
+			rootPart.CFrame = plr.DeathPos.Value * CFrame.new(0, 3, 0)
+			
+			local sound = Instance.new("Sound", char.Head)
+			sound.SoundId = "rbxassetid://5193339590"			
+			sound:Play()
+
+			sound.Ended:Wait()
+			sound:Destroy()
+
+			local sound2 = Instance.new("Sound", char.Head)
+			sound2.SoundId = "rbxassetid://7148330411"	
+			sound2:Play()
+
+			game.StarterGui:SetCore("ChatMakeSystemMessage", { Text = "* But it refused.", Font = Enum.Font.Code})
+
+			local anim = Instance.new("Animation")
+			anim.AnimationId = "rbxassetid://14611931363"
+
+			hum.Animator:LoadAnimation(anim):Play()
+
+			sound2.Ended:Connect(function()
+				sound2:Destroy()
+			end)
+		end
+	end
+	
+	hum:GetPropertyChangedSignal("Health"):Connect(function()
+		local enabled = plr:WaitForChild("EnableRefuse")
+		
+		if enabled.Value == true then
+			if not plr:FindFirstChild("DeathPos") then
+				local int = Instance.new("CFrameValue", plr)
+				int.Name = "DeathPos"
+				
+				local raycastResult =  isPlayerOnGround()
+				
+				if raycastResult then
+					int.Value = rootPart.CFrame
+				end
+			else
+				local int = plr.DeathPos
+				
+				local raycastResult = isPlayerOnGround()
+				
+				if raycastResult then
+					int.Value = rootPart.CFrame
+				end
+			end
+		end
+	end)
+end)
