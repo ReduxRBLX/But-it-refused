@@ -12,6 +12,32 @@ UI.Name = "RefusedScript"
 UI.IgnoreGuiInset = true
 UI.ResetOnSpawn = false
 
+local frame = Instance.new("Frame", UI)
+frame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+frame.Size = UDim2.new(1, 0, 1, 0)
+frame.Visible = false
+
+local heart = Instance.new("ImageLabel", frame)
+heart.BackgroundTransparency = 1
+heart.Position = UDim2.new(0.439, 0, 0.449, 0)
+heart.Size = UDim2.new(0.122, 0, 0.246, 0)
+heart.Image = "rbxassetid://92754779587286"
+heart.ImageColor3 = Color3.fromRGB(255, 0, 0)
+heart.ScaleType = Enum.ScaleType.Crop
+
+local text = Instance.new("TextLabel", frame)
+text.Name = "RefusedText"
+text.BackgroundTransparency = 1
+text.Position = UDim2.new(0.371, 0, 0.266, 0)
+text.Size = UDim2.new(0.257, 0, 0.041, 0)
+text.TextColor3 = Color3.fromRGB(255, 255, 255)
+text.Font = Enum.Font.Code
+text.Text = "* But it refused."
+text.TextScaled = true
+text.TextStrokeTransparency = 0.85
+text.Visible = false
+
+
 local cred = Instance.new("TextLabel", UI)
 cred.BackgroundTransparency = 1
 cred.Position = UDim2.new(0.725, 0, 0.016, 0)
@@ -68,6 +94,69 @@ local function isPlayerOnGround()
 	return result 
 end
 
+local ts = game:GetService("TweenService")
+
+local function fadeUI(FadeFrame)
+	local function hasProperty(object, prop)
+		local t = object[prop]
+	end
+
+	for i, v in pairs(FadeFrame:GetChildren()) do
+		local success = pcall(function() hasProperty(v, "Visible") end)
+
+		if success then
+			v.Visible = false
+		end
+	end
+
+	local prevTransparency = FadeFrame.BackgroundTransparency
+
+	local Framefade = ts:Create(FadeFrame, TweenInfo.new(1), {BackgroundTransparency = 1})
+	Framefade:Play()
+	Framefade.Completed:Wait()
+	FadeFrame.Visible = false
+
+	FadeFrame.BackgroundTransparency = prevTransparency
+
+	for i, v in pairs(FadeFrame:GetChildren()) do
+		local success = pcall(function() hasProperty(v, "Visible") end)
+
+		if success then
+			v.Visible = true
+		end
+	end
+end
+
+hum.Died:Connect(function()
+	local enabled = plr:WaitForChild("EnableRefuse")
+
+	if enabled.Value == true then
+		frame.Visible = true
+
+		local sound = Instance.new("Sound", workspace)
+		sound.SoundId = "rbxassetid://5193339590"		
+		sound.Volume = 1
+		sound:Play()
+		task.wait(2.5)
+
+		sound.Ended:Connect(function()
+			sound:Destroy()
+		end)
+
+		local sound2 = Instance.new("Sound", workspace)
+		sound2.SoundId = "rbxassetid://7148330411"	
+		sound2.Volume = 1
+		sound2:Play()
+
+		sound2.Ended:Connect(function()
+			sound2:Destroy()
+		end)
+
+		text.Visible = true
+		heart.Image = "rbxassetid://9632333669"
+	end
+end)
+
 hum:GetPropertyChangedSignal("Health"):Connect(function()
 	local enabled = plr:WaitForChild("EnableRefuse")
 
@@ -102,17 +191,9 @@ plr.CharacterAdded:Connect(function(char)
 	if enabled.Value == true then
 		if plr:FindFirstChild("DeathPos") then
 			rootPart.CFrame = plr.DeathPos.Value * CFrame.new(0, 3, 0)
-			
-			local sound = Instance.new("Sound", char.Head)
-			sound.SoundId = "rbxassetid://5193339590"			
-			sound:Play()
-
-			sound.Ended:Wait()
-			sound:Destroy()
-
-			local sound2 = Instance.new("Sound", char.Head)
-			sound2.SoundId = "rbxassetid://7148330411"	
-			sound2:Play()
+			fadeUI(frame)
+			text.Visible = false
+			heart.Image = "rbxassetid://92754779587286"
 
 			game.StarterGui:SetCore("ChatMakeSystemMessage", { Text = "* But it refused.", Font = Enum.Font.Code})
 
@@ -120,12 +201,38 @@ plr.CharacterAdded:Connect(function(char)
 			anim.AnimationId = "rbxassetid://14611931363"
 
 			hum.Animator:LoadAnimation(anim):Play()
+		end
+	end
+	
+	hum.Died:Connect(function()
+		local enabled = plr:WaitForChild("EnableRefuse")
 
+		if enabled.Value == true then
+			frame.Visible = true
+			
+			local sound = Instance.new("Sound", workspace)
+			sound.SoundId = "rbxassetid://5193339590"		
+			sound.Volume = 1
+			sound:Play()
+			task.wait(2.5)
+			
+			sound.Ended:Connect(function()
+				sound:Destroy()
+			end)
+			
+			local sound2 = Instance.new("Sound", workspace)
+			sound2.SoundId = "rbxassetid://7148330411"	
+			sound2.Volume = 1
+			sound2:Play()
+			
 			sound2.Ended:Connect(function()
 				sound2:Destroy()
 			end)
+			
+			text.Visible = true
+			heart.Image = "rbxassetid://9632333669"
 		end
-	end
+	end)
 	
 	hum:GetPropertyChangedSignal("Health"):Connect(function()
 		local enabled = plr:WaitForChild("EnableRefuse")
@@ -152,3 +259,4 @@ plr.CharacterAdded:Connect(function(char)
 		end
 	end)
 end)
+
