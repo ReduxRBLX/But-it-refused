@@ -79,21 +79,6 @@ toggle.MouseButton1Click:Connect(function()
 	end
 end)
 
-
-local raycastParams = RaycastParams.new()
-raycastParams.FilterDescendantsInstances = {char}
-raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-raycastParams.IgnoreWater = true
-
-local function isPlayerOnGround()
-	local origin = char.PrimaryPart.Position
-	local direction = Vector3.new(0, -5, 2).Unit
-
-	local result = workspace:Raycast(origin, direction, raycastParams)
-
-	return result 
-end
-
 local ts = game:GetService("TweenService")
 
 local function fadeUI(FadeFrame)
@@ -176,17 +161,14 @@ hum:GetPropertyChangedSignal("Health"):Connect(function()
 			local int = Instance.new("CFrameValue", plr)
 			int.Name = "DeathPos"
 
-			local raycastResult =  isPlayerOnGround()
-
-			if raycastResult then
+			if hum.FloorMaterial ~= Enum.Material.Air then
 				int.Value = rootPart.CFrame
 			end
 		else
 			local int = plr.DeathPos
 
-			local raycastResult = isPlayerOnGround()
 
-			if raycastResult then
+			if hum.FloorMaterial ~= Enum.Material.Air then
 				int.Value = rootPart.CFrame
 			end
 		end
@@ -258,17 +240,13 @@ plr.CharacterAdded:Connect(function(char)
 				local int = Instance.new("CFrameValue", plr)
 				int.Name = "DeathPos"
 				
-				local raycastResult =  isPlayerOnGround()
-				
-				if raycastResult then
+				if hum.FloorMaterial ~= Enum.Material.Air then
 					int.Value = rootPart.CFrame
 				end
 			else
 				local int = plr.DeathPos
 				
-				local raycastResult = isPlayerOnGround()
-				
-				if raycastResult then
+				if hum.FloorMaterial ~= Enum.Material.Air then
 					int.Value = rootPart.CFrame
 				end
 			end
